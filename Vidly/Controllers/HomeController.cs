@@ -6,6 +6,8 @@ using System.Web.Mvc;
 
 namespace Vidly.Controllers
 {
+    // CPRINS  PAra indicar al controlador o a la accion que no solicite autenticacion de usuario
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         public ActionResult Index()
