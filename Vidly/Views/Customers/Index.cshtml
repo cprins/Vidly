@@ -1,0 +1,112 @@
+﻿@model IEnumerable<Vidly.Models.Customer>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    @* si hay mas de 5 clientes la varible className se le coloca la palabra "Popular" en caso contrario se deja nulo, esto para hacer parametros de clase dinamicos *@
+
+   // var className = Model.Count() != 0 ? "Popular" : null;
+}
+
+@* Se le coloca el nombre usando el parametro que se le envia. con el arroba, se usan comando de c#*@
+
+
+<h2>Clientes</h2>
+
+<p>
+    @Html.ActionLink("Nuevo Cliente", "New", "Customers", null, new { @class = "btn btn-primary" })
+</p>
+
+<table id="customers" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Tipo de Membresia</th>
+            @*  <th>Tasa de descuento</th> *@
+            <th>Eliminar</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @*No se usa ya que se esta invocando desde el api que se creo *@
+        @* @foreach (var customers in Model)
+            {
+            <tr>
+                <td>@Html.ActionLink(@customers.Name, "Edit", "Customers", new { id = @customers.Id }, null)</td>
+                <td>@customers.MembershipType.Name</td>
+                @* El simbolo % al final es para que mueste el simbolo %, el sistema identifica que ese no es codigo de C#*@
+        @* <td>@customers.MembershipType.DiscountRate%</td>
+                <td>
+                    <button data-customer-id="@customers.Id" class="btn-link js-delete">Eliminar</button>
+                </td>
+            </tr>
+            }*@
+
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            // CPRINS Solo funcina cuando tabla tiene las etiquetas <thead> y <tbody>
+           var table = $("#customers").DataTable(
+
+                {
+                    // CPRINS se utiliza el api para traer los registros de la tabla, en teoria es mas eficiente
+                    ajax: {
+                        url: "/api/customers",
+                        dataSrc: ""
+
+                    },
+
+                    columns: [
+                        {
+                            data: "name",
+                            render: function (data, type, customer) {
+                                return "<a href='/customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                            }
+                        },
+                        {
+                            data: "membershipType.name"
+                        },
+                        {
+                            data: "id",
+                            render: function (data) {
+                                return "<button class='btn-link js-delete' data-customer-id=" + data + ">Eliminar</button>";
+                            }
+                        }
+
+
+                    ],
+
+
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+                    }
+                }
+
+            );
+
+            $("#customers").on("click", ".js-delete", function () {
+                var button = $(this);
+                bootbox.confirm("Estas seguro que deseas eliminar este cliente?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                // Para borrar el registro definitivamente de la DataTable
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+}

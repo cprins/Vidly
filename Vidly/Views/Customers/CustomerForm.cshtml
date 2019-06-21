@@ -1,0 +1,64 @@
+﻿@model Vidly.ViewModels.CustomerFormViewModel
+@{
+    ViewBag.Title = "New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    @* si hay mas de 5 clientes la varible className se le coloca la palabra "Popular" en caso contrario se deja nulo, esto para hacer parametros de clase dinamicos *@
+
+    var nombreBoton = Model.Customer == null || Model.Customer.Id == 0 ? "Crear" : "Actualizar";
+}
+
+
+@if (Model.Customer == null || Model.Customer.Id == 0)
+{
+    <h2>Nuevo Cliente</h2>
+}
+else
+{
+    <h2>Editar Cliente</h2>
+}
+
+
+@using (Html.BeginForm("Save", "Customers"))
+{
+    @Html.ValidationSummary(true, "Corregir los siguientes errores");
+    <div class="form-group">
+        @Html.Label("Nombre")
+        @Html.TextBoxFor(m => m.Customer.Name, new { @class = "form-control" })
+        @* CPRINS: Se valida segun las propiedaddes colocadas en el modelo*@
+        @Html.ValidationMessageFor(m => m.Customer.Name)
+    </div>
+    <div class="form-group">
+        @Html.Label("Tipo de membresia")
+        @Html.DropDownListFor(m => m.Customer.MembershipTypeId, new SelectList(Model.MembershipTypes, "Id", "Name"), "Selecciona el tipo de Membresia", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Customer.MembershipTypeId)
+    </div>
+    <div class="form-group">
+        @Html.Label("Fecha de cumpleaños")
+        @Html.TextBoxFor(m => m.Customer.Birthdate, "{0:dd/MM/yyyy}", new { @class = "form-control quita-val-fecha" })
+        @Html.ValidationMessageFor(m => m.Customer.Birthdate)
+    </div>
+    <div class="checkbox">
+        <label>
+            @Html.CheckBoxFor(m => m.Customer.IsSubscribedToNewsletter) Está suscrito al periodico?
+        </label>
+    </div>
+    @Html.HiddenFor(m => m.Customer.Id)
+    // CPRINS Para evitar falsificacion de solicitud
+    @Html.AntiForgeryToken();
+
+    <button type="submit" class="btn btn-primary">@nombreBoton</button>
+
+    // Para que las validaciones de propiedades se hagan al nivel del cliente
+    @section scripts
+    {
+        @Scripts.Render("~/bundles/jqueryval")
+        <script>
+                $('.quita-val-fecha').removeAttr("data-val-date");
+        </script>
+    }
+
+}

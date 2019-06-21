@@ -1,0 +1,29 @@
+﻿
+@model Vidly.ViewModels.RandomMovieViewModel
+@{
+    ViewBag.Title = "Random";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    @* si hay mas de 5 clientes la varible className se le coloca la palabra "Popular" en caso contrario se deja nulo, esto para hacer parametros de clase dinamicos *@
+    var className = Model.Customers.Count > 0 ? "Popular" : null;
+}
+
+@* Se le coloca el nombre usando el parametro que se le envia. con el arroba, se usan comando de c#*@
+<h2 class= "@className">@Model.Movie.Name</h2>
+
+@if (Model.Customers.Count == 0)
+{
+   <text>Nadie ha alquilado esta pelicula antes.</text>
+}
+else
+{
+    <ul>
+        @foreach (var customer in Model.Customers)
+        {
+            <li>@customer.Name</li>
+        }
+    </ul>
+}
+
