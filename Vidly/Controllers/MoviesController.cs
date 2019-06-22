@@ -66,6 +66,10 @@ namespace Vidly.Controllers
             return View(movie);
         }
 
+        /* CPRINS: Para que solo la persona con ese rol pueda ingresar a ese controlador*/
+        /*[Authorize(Roles = "members, admin")]*/
+        /*[Authorize(Roles = CustomRoles.Administrator +","+ CustomRoles.User)]*/
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult New()
         {
 
@@ -82,6 +86,7 @@ namespace Vidly.Controllers
         [HttpPost]
         // CPRINS Para evitar falsificacion de solicitud
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Save(Movie movie)
         {
 
@@ -118,6 +123,7 @@ namespace Vidly.Controllers
             return RedirectToAction("Index", "Movies");
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Edit(int id)
         {
             var movie = _context.Movies.SingleOrDefault(c => c.Id == id);
@@ -137,3 +143,4 @@ namespace Vidly.Controllers
 
     }
 }
+ 

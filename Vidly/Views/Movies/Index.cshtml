@@ -1,18 +1,24 @@
 ﻿
+@using Vidly.Models;
+
 @model IEnumerable<Vidly.Models.Movie>
 @{
-                /**/
+    /**/
 
-                /**/
+    /**/
 
-                ViewBag.Title = "Index";
-                Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @{
     @* si hay mas de 5 clientes la varible className se le coloca la palabra "Popular" en caso contrario se deja nulo, esto para hacer parametros de clase dinamicos *@
 
     //   var className = Model.Count() != 0 ? "Popular" : null;
+
+    var noManejaPelis = "DontManageMovies";
+    var classManageMovies = User.IsInRole(RoleName.CanManageMovies) ? null : noManejaPelis;
+
 }
 
 @* Se le coloca el nombre usando el parametro que se le envia. con el arroba, se usan comando de c#*@
@@ -24,12 +30,16 @@
         @Html.ActionLink("Nueva Pelicula", "New", "Movies", null, new { @class = "btn btn-primary" })
     </p>
 
+    @*CPRINS Para el manejo de acceso de usuario*@
+
+    <p id="manageMovies" data-value=@noManejaPelis class=@classManageMovies></p>
+
     <table id="movies" class="table table-bordered	table-hover">
         <thead>
             <tr>
                 <th>Pelicula</th>
                 <th>Género</th>
-                <th>Eliminar</th>
+                <th not-manage-movies=@classManageMovies data-value="2">Eliminar</th>
             </tr>
         </thead>
         <tbody>
@@ -51,9 +61,14 @@
     <script>
         $(document).ready(function () {
 
+            /*CPRINS Se valida si el usuario tiene permiso para gestionar peliculas a nivel de jquery*/
+            var manageMovies = true;
+            var claseNoManejaMovies = $("#manageMovies").attr("data-value");
+            if ($("#manageMovies").hasClass(claseNoManejaMovies)) {
+                manageMovies = false;
+            }
 
-
-           var table = $("#movies").DataTable(
+            var table = $("#movies").DataTable(
                 {
 
                     // CPRINS se utiliza el api para traer los registros de la tabla, en teoria es mas eficiente
@@ -67,7 +82,12 @@
                         {
                             data: "name",
                             render: function (data, type, movie) {
-                                return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                                if (!manageMovies) {
+                                    return movie.name;
+                                }
+                                else {
+                                    return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                                }
                             }
                         },
                         {
@@ -89,7 +109,16 @@
 
                 });
 
-            $("#movies").on("click", ".js-delete", function () { 
+            /* CPRINS: Se recorre los encabezados, y si hay algun campo que se debe esconder por no poseer permiso (Como el campo eliminar), se hace*/
+            $("th").each(function () {
+                if ($(this).attr("not-manage-movies") == claseNoManejaMovies) {
+                    var columna = table.column($(this).attr("data-value"));
+                    columna.visible(false);
+                }
+
+            });
+
+            $("#movies").on("click", ".js-delete", function () {
                 var button = $(this);
                 bootbox.confirm("Estas seguro que deseas eliminar esta película?", function (result) {
                     if (result) {
