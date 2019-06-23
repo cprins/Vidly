@@ -26,9 +26,12 @@
 
 <h2>Peliculas</h2>
 
-@{ <p>
-        @Html.ActionLink("Nueva Pelicula", "New", "Movies", null, new { @class = "btn btn-primary" })
-    </p>
+@{  
+    if (User.IsInRole(RoleName.CanManageMovies)) { 
+        <p>
+            @Html.ActionLink("Nueva Pelicula", "New", "Movies", null, new { @class = "btn btn-primary" })
+        </p>
+    }
 
     @*CPRINS Para el manejo de acceso de usuario*@
 
