@@ -312,6 +312,10 @@
     <Compile Include="Migrations\202002082334370_AgregarModeloRental.Designer.cs">
       <DependentUpon>202002082334370_AgregarModeloRental.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004042230409_Agregar_col_NumberAvailable_en_Movie_entidad.cs" />
+    <Compile Include="Migrations\202004042230409_Agregar_col_NumberAvailable_en_Movie_entidad.Designer.cs">
+      <DependentUpon>202004042230409_Agregar_col_NumberAvailable_en_Movie_entidad.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Customer.cs" />
@@ -648,6 +652,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002082334370_AgregarModeloRental.resx">
       <DependentUpon>202002082334370_AgregarModeloRental.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004042230409_Agregar_col_NumberAvailable_en_Movie_entidad.resx">
+      <DependentUpon>202004042230409_Agregar_col_NumberAvailable_en_Movie_entidad.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
