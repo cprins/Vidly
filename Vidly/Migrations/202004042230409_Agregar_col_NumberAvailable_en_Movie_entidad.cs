@@ -8,6 +8,8 @@ namespace Vidly.Migrations
         public override void Up()
         {
             AddColumn("dbo.Movies", "NumberAvailable", c => c.Byte(nullable: false));
+
+            Sql("UPDATE Movies SET NumberAvailable = CantStock");
         }
         
         public override void Down()

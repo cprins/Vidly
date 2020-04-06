@@ -30,6 +30,7 @@ namespace Vidly.Controllers.Api
             /* Para guardar los alquileres */
             foreach (var movie in movies)
             {
+                movie.NumberAvailable--;
 
                 var rental = new Rental
                 {
