@@ -12,7 +12,15 @@ namespace Vidly.Controllers.Api
 {
     public class NewRentalsController : ApiController
     {
+
+
         private ApplicationDbContext _context;
+
+        public NewRentalsController()
+        {
+            _context = new ApplicationDbContext();
+        }
+
 
         [HttpPost]
         public IHttpActionResult CreateNewRentals(NewRentalDto newRental)
@@ -51,9 +59,12 @@ namespace Vidly.Controllers.Api
                 };
 
                 _context.Rentals.Add(rental);
+                _context.SaveChanges();
             }
 
-            throw new NotImplementedException();
+            return Created(new Uri(Request.RequestUri + "/" + newRental.CustomerId), newRental);
+
+            /*  throw new NotImplementedException();*/
         }
         
 
