@@ -9,13 +9,95 @@
 <form>
     <div class="form-group">
         <label>Cliente</label>
-        <input type="text" value="" class="form-control" />
+        <div class="tt-container">
+            <input id="customer" type="text" value="" class="form-control" />
+        </div>
     </div>
 
     <div class="form-group">
         <label>Pelicula</label>
-        <input type="text" value="" class="form-control" />
+        <div class="tt-container">
+            <input id="movie" type="text" value="" class="form-control" />
+        </div>
     </div>
+        
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <ul id="movies" class="list-group"></ul>
+            </div>
+        </div>
+        
 
-    <button class="btn btn-primary">Registrar Alquiler</button>
+        <button class="btn btn-primary">Registrar Alquiler</button>
 </form>
+
+@section scripts
+
+{
+    @* Esta es la funcion de autocompletar*@
+    <script>
+        $(document).ready(function () {
+
+            var vm = {
+                movieIds: []
+            };
+
+            var customers = new Bloodhound({
+                @* name, es el nombre del campo que queremos que autocomplete *@
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    @* url: la fuente de donde tomara la informacion, en este caso el api de clientes. QUERY es para filtrar *@
+                    url: '/api/customers?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            var movies = new Bloodhound({
+                @* name, es el nombre del campo que queremos que autocomplete *@
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    @* url: la fuente de donde tomara la informacion, en este caso el api de clientes.QUERY es para filtrar *@
+                    url: '/api/movies?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#customer').typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                @* Se coloca el nombre que tendra el objeto, el valor que tomara, y la fuente de donde lo tomara *@
+                    name: 'customers',
+                    display: 'name',
+                    source: customers
+                }).on("typeahead:select", function (e, customer) {
+                    vm.customerId = customer.id;
+                });
+
+
+            $('#movie').typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                @* Se coloca el nombre que tendra el objeto, el valor que tomara, y la fuente de donde lo tomara *@
+                name: 'movies',
+                display: 'name',
+                source: movies
+             }).on("typeahead:select", function (e, movie) {
+                 vm.customerId = customer.id;
+                 @* Se agrega en la lista la seleccion de pelicula*@
+                 $("#movies").append("<li class= 'list-group-item'>" + movie.name + "</li>");
+
+                 @* Para borrar el valor que se incluyo en el texto, para que luego pueda incluir otro*@
+                 $("#movie").typeahead("val", "");
+
+                 @* Para guardar el id de la pelicula en la lista *@
+                 vm.movieIds.push(movie.id);
+
+             });
+
+        });
+    </script>
+}
