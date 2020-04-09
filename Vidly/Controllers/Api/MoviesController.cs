@@ -29,8 +29,9 @@ namespace Vidly.Controllers.Api
             var moviesQuery = _context.Movies.Include(c => c.Genre);
 
             if (!String.IsNullOrWhiteSpace(query))
-                moviesQuery = moviesQuery.Where(c => c.Name.Contains(query));
-
+            { }
+                moviesQuery = moviesQuery.Where(c => c.Name.Contains(query)).Where(c => c.NumberAvailable >0);
+                
             var movieDtos = moviesQuery
             .ToList().Select(Mapper.Map<Movie, MovieDto>);
 
