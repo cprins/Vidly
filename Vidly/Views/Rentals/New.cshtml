@@ -108,10 +108,11 @@
 
                 })
                     .done(function () {
-                        console.log("done")
+                        @*console.log("done") *@
+                        toastr.success("Alquiler registrado satisfactoriamente.");
                     })
                     .fail(function () {
-                        console.log("ocurrio error")
+                        toastr.error("Ocurrio error al tratar de registrar el alquiler.")
                     })
             });
 
