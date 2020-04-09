@@ -6,7 +6,7 @@
 <h2>Nuevo alquiler</h2>
 
 
-<form>
+<form id ="newRental">
     <div class="form-group">
         <label>Cliente</label>
         <div class="tt-container">
@@ -82,21 +82,38 @@
                 highlight: true
             }, {
                 @* Se coloca el nombre que tendra el objeto, el valor que tomara, y la fuente de donde lo tomara *@
-                name: 'movies',
-                display: 'name',
-                source: movies
-             }).on("typeahead:select", function (e, movie) {
-                 vm.customerId = customer.id;
+                    name: 'movies',
+                    display: 'name',
+                    source: movies
+                }).on("typeahead:select", function (e, movie) {
                  @* Se agrega en la lista la seleccion de pelicula*@
-                 $("#movies").append("<li class= 'list-group-item'>" + movie.name + "</li>");
+                    $("#movies").append("<li class= 'list-group-item'>" + movie.name + "</li>");
 
                  @* Para borrar el valor que se incluyo en el texto, para que luego pueda incluir otro*@
-                 $("#movie").typeahead("val", "");
+                    $("#movie").typeahead("val", "");
 
                  @* Para guardar el id de la pelicula en la lista *@
-                 vm.movieIds.push(movie.id);
+                    vm.movieIds.push(movie.id);
 
-             });
+                });
+
+            $("#newRental").submit(function (e) {
+                /* para prevenir el submit normalmente, ya que lo haremos por ajax */
+                e.preventDefault();
+
+                $.ajax({
+                    url: "/api/NewRentals",
+                    method: "post",
+                    data: vm
+
+                })
+                    .done(function () {
+                        console.log("done")
+                    })
+                    .fail(function () {
+                        console.log("ocurrio error")
+                    })
+            });
 
         });
     </script>
