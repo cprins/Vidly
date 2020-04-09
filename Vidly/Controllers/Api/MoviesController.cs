@@ -20,12 +20,22 @@ namespace Vidly.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
-        // GET /apimovies
-        public IEnumerable<MovieDto> GetMovies()
+        // GET /api/movies
+        public  IHttpActionResult GetMovies(string query = null)
         {
             // CPRINS: se mapea para que envie la estructura de movieDto con el AutoMapper. No olvidar crear el AutoMapping para Genre o la tabla asociada
             // return _context.Movies.ToList().Select(Mapper.Map<Movie, MovieDto>);
-            return _context.Movies.Include(c => c.Genre).ToList().Select(Mapper.Map<Movie, MovieDto>);
+
+            var moviesQuery = _context.Movies.Include(c => c.Genre);
+
+            if (!String.IsNullOrWhiteSpace(query))
+                moviesQuery = moviesQuery.Where(c => c.Name.Contains(query));
+
+            var movieDtos = moviesQuery
+            .ToList().Select(Mapper.Map<Movie, MovieDto>);
+
+
+            return Ok(movieDtos);
         }
 
         // GET /api/movies/1
