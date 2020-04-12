@@ -6,34 +6,36 @@
 <h2>Nuevo alquiler</h2>
 
 
-<form id ="newRental">
+<form id="newRental">
     <div class="form-group">
         <label>Cliente</label>
         <div class="tt-container">
-            <input id="customer" type="text" value="" class="form-control" />
+            <input id="customer" data-rule-validCustomer="true"  name="customer" required type="text" value="" class="form-control" />
         </div>
     </div>
 
     <div class="form-group">
         <label>Pelicula</label>
         <div class="tt-container">
-            <input id="movie" type="text" value="" class="form-control" />
+            <input id="movie"  data-rule-validMovie="true"  name="movie" type="text" value="" class="form-control" />
         </div>
     </div>
-        
-        <div class="row">
-            <div class="col-md-4 col-sm-4">
-                <ul id="movies" class="list-group"></ul>
-            </div>
-        </div>
-        
 
-        <button class="btn btn-primary">Registrar Alquiler</button>
+    <div class="row">
+        <div class="col-md-4 col-sm-4">
+            <ul id="movies" class="list-group"></ul>
+        </div>
+    </div>
+
+
+    <button class="btn btn-primary">Registrar Alquiler</button>
 </form>
 
 @section scripts
 
 {
+    @Scripts.Render("~/bundles/jqueryval")
+
     @* Esta es la funcion de autocompletar*@
     <script>
         $(document).ready(function () {
@@ -97,23 +99,52 @@
 
                 });
 
-            $("#newRental").submit(function (e) {
-                /* para prevenir el submit normalmente, ya que lo haremos por ajax */
-                e.preventDefault();
+           @*  Se valida que se seleccione un cliente valido  *@
+            $.validator.addMethod("validCustomer", function () {
+                return vm.customerId && vm.customerId !== 0;
+            }, "Por favor seleccionar un cliente valido."); 
 
-                $.ajax({
-                    url: "/api/NewRentals",
-                    method: "post",
-                    data: vm
+           @*  Se valida que se seleccione por lo menos una pelicula *@
+            $.validator.addMethod("validMovie", function () {
+                return vm.movieIds.length >0
+            }, "Por favor seleccionar al menos una pelicula.");
 
-                })
-                    .done(function () {
-                        @*console.log("done") *@
-                        toastr.success("Alquiler registrado satisfactoriamente.");
+            @* Para que se valide del lado del cliente segun las propiedades del html*@
+           var validator = $("#newRental").validate({
+
+                @* Para que luego de validar haga el submit *@
+                submitHandler: function () {
+                    /* para prevenir el submit normalmente, ya que lo haremos por ajax */
+                    
+
+                    $.ajax({
+                        url: "/api/NewRentals",
+                        method: "post",
+                        data: vm
+
                     })
-                    .fail(function () {
-                        toastr.error("Ocurrio error al tratar de registrar el alquiler.")
-                    })
+                        .done(function () {
+                            @* console.log("done") *@
+                            toastr.success("Alquiler registrado satisfactoriamente.");
+
+                            @* Para resetar los campos y la lista de peliculas cuando es exitoso *@
+                            $("#customer").typeahead("val", "");
+                            $("#movie").typeahead("val", "");
+                            $("#movies").empty();
+
+                            vm = { movieIds: [] };
+
+                            @* Se resetea el estado de la forma a su estado inicial *@
+                            validator.resetForm();
+
+                        })
+                        .fail(function () {
+                            toastr.error("Ocurrio error al tratar de registrar el alquiler.");
+                        });
+                    @* Se coloca el retur false para que no se realice el submit normalmente sino por el ajax *@
+                    return false;
+                }
+
             });
 
         });
